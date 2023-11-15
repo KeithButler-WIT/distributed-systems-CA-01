@@ -19,6 +19,13 @@ export type Movie = {
     roleDescription: string;
   }
 
+  export type MovieReviews = {
+    movieId: number;
+    reviewerName: string;
+    reviewData: string;
+    content: string;
+  }
+
   // Used to validate the query string og HTTP Get requests
   export type MovieCastMemberQueryParams = {
     movieId: string;
