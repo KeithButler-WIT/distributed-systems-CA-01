@@ -1,17 +1,15 @@
+// import { Handler } from "aws-lambda";
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, ScanCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const ddbClient = new DynamoDBClient({ region: process.env.REGION });
+// const ddbClient = createDDbDocClient();
 
 export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
   try {
-    // Print Event
     console.log("Event: ", event);
-    // console.log("Event: ", JSON.stringify(event?.queryStringParameters));
-    // const parameters = event?.queryStringParameters;
-    // const movieId = parameters ? parseInt(parameters.movieId) : undefined;
     const parameters  = event?.pathParameters;
     const movieId = parameters?.movieId ? parseInt(parameters.movieId) : undefined;
     
@@ -25,17 +23,15 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
 
-    // Print Event
-    console.log("Event: ", event);
-
     const commandOutput = await ddbClient.send(
-      new ScanCommand({
+      new GetCommand({
         TableName: process.env.TABLE_NAME,
-          // Key: { movieId: movieId },
-          // TODO add listing all movie reviews
+        Key: { movieId: movieId },
       })
-    );
-    if (!commandOutput.Items) {
+    )
+
+    console.log("GetCommand response: ", commandOutput);
+    if (!commandOutput.Item) {
       return {
         statusCode: 404,
         headers: {
@@ -45,7 +41,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
     const body = {
-      data: commandOutput.Items,
+      data: commandOutput.Item,
     };
 
     // Return Response
