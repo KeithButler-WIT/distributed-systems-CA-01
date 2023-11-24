@@ -52,49 +52,7 @@
             ],
             "type": "object"
         },
-        "MovieCast": {
-            "additionalProperties": false,
-            "properties": {
-                "actorName": {
-                    "type": "string"
-                },
-                "movieId": {
-                    "type": "number"
-                },
-                "roleDescription": {
-                    "type": "string"
-                },
-                "roleName": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "actorName",
-                "movieId",
-                "roleDescription",
-                "roleName"
-            ],
-            "type": "object"
-        },
-        "MovieCastMemberQueryParams": {
-            "additionalProperties": false,
-            "properties": {
-                "actorName": {
-                    "type": "string"
-                },
-                "movieId": {
-                    "type": "string"
-                },
-                "roleName": {
-                    "type": "string"
-                }
-            },
-            "required": [
-                "movieId"
-            ],
-            "type": "object"
-        },
-        "MovieReviews": {
+        "MovieReview": {
             "additionalProperties": false,
             "properties": {
                 "content": {
@@ -103,7 +61,7 @@
                 "movieId": {
                     "type": "number"
                 },
-                "reviewData": {
+                "reviewDate": {
                     "type": "string"
                 },
                 "reviewerName": {
@@ -113,8 +71,26 @@
             "required": [
                 "content",
                 "movieId",
-                "reviewData",
+                "reviewDate",
                 "reviewerName"
+            ],
+            "type": "object"
+        },
+        "MovieReviewQueryParams": {
+            "additionalProperties": false,
+            "properties": {
+                "movieId": {
+                    "type": "string"
+                },
+                "reviewDate": {
+                    "type": "string"
+                },
+                "reviewerName": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "movieId"
             ],
             "type": "object"
         }

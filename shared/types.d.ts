@@ -1,4 +1,3 @@
-
 export type Movie = {
     movieId: number;
     genre_ids: number[];
@@ -12,23 +11,17 @@ export type Movie = {
     vote_count: number
   }
 
-  export type MovieCast = {
-    movieId: number;
-    actorName: string;
-    roleName: string;
-    roleDescription: string;
-  }
 
-  export type MovieReviews = {
+  export type MovieReview = {
     movieId: number;
     reviewerName: string;
-    reviewData: string;
-    content: string;
+    reviewDate: string;
+    content: string
   }
 
   // Used to validate the query string og HTTP Get requests
-  export type MovieCastMemberQueryParams = {
+  export type MovieReviewQueryParams = {
     movieId: string;
-    actorName?: string;
-    roleName?: string
+    reviewerName?: string;
+    reviewDate?: string
   }
