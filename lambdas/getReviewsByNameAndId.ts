@@ -1,7 +1,8 @@
 import { APIGatewayProxyHandlerV2 } from "aws-lambda";
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, QueryCommand, QueryCommandInput } from "@aws-sdk/lib-dynamodb";
+
 
 const ddbDocClient = createDDbDocClient();
 
@@ -10,6 +11,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     // Print Event
     console.log("Event: ", event);
     const parameters  = event?.pathParameters;
+    const movieId = parameters?.movieId ? parseInt(parameters.movieId) : undefined;
     const reviewerName = parameters?.reviewerName ? parameters.reviewerName : undefined;
 
     if (!reviewerName) {
@@ -22,23 +24,37 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
 
-    const commandOutput = await ddbDocClient.send(
-      new GetCommand({
+    let commandInput: QueryCommandInput = {
         TableName: process.env.TABLE_NAME,
-        Key: { 
-            // TODO fix this
-            KeyConditionExpression: "reviewerName = begins_with(reviewerName) ",
+    };
+    if (reviewerName) {
+        commandInput = {
+            ...commandInput,
+            IndexName: "reviewIx",
+            KeyConditionExpression: "movieId = :m and begins_with(reviewerName, :n)",
             ExpressionAttributeValues: {
-                reviewerName: reviewerName,
+                ":m": movieId,
+                ":n": reviewerName,
             },
+        };
+    }
+  
+    // commandInput = {
+        // ...commandInput,
+        // IndexName: "reviewerIx",
+        // KeyConditionExpression: "movieId = :m and begins_with(reviewerName, :n)",
+        // ExpressionAttributeValues: {
+        //   ":m": movieId,
+        //   ":n": reviewerName,
+        // },
+    // };
 
-        },
-        // TableName: process.env.TABLE_NAME,
-        // Key: { reviewerName: reviewerName },
-      })
+    const commandOutput = await ddbDocClient.send(
+      new QueryCommand(commandInput)
     );
-    console.log("GetCommand response: ", commandOutput);
-    if (!commandOutput.Item) {
+    
+    console.log("QueryCommand response: ", commandOutput);
+    if (!commandOutput.Items) {
       return {
         statusCode: 404,
         headers: {
@@ -48,7 +64,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       };
     }
     const body = {
-      data: commandOutput.Item,
+      data: commandOutput.Items,
     };
 
     // Return Response
