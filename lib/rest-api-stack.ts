@@ -64,10 +64,10 @@ export class RestAPIStack extends cdk.Stack {
       },
     });
 
-    const getReviewByNameFn = new lambdanode.NodejsFunction(this, "GetReviewByNameFn", {
+    const getReviewsByNameFn = new lambdanode.NodejsFunction(this, "GetReviewsByNameFn", {
       architecture: lambda.Architecture.ARM_64,
       runtime: lambda.Runtime.NODEJS_16_X,
-      entry: `${__dirname}/../lambdas/getReviewByName.ts`,
+      entry: `${__dirname}/../lambdas/getReviewsByName.ts`,
       timeout: cdk.Duration.seconds(10),
       memorySize: 128,
       environment: {
@@ -123,7 +123,7 @@ export class RestAPIStack extends cdk.Stack {
     const reviewerNameEndpoint = reviewEndpoint.addResource("{reviewerName}");
     reviewerNameEndpoint.addMethod(
       "GET",
-      new apig.LambdaIntegration(getReviewByNameFn, { proxy: true })
+      new apig.LambdaIntegration(getReviewsByNameFn, { proxy: true })
     );
 
     const movieEndpoint = moviesEndpoint.addResource("{movieId}");
@@ -136,7 +136,7 @@ export class RestAPIStack extends cdk.Stack {
 
     // Permissions 
     movieReviewsTable.grantReadWriteData(newReviewFn)
-    movieReviewsTable.grantReadData(getReviewByNameFn)
+    movieReviewsTable.grantReadData(getReviewsByNameFn)
     movieReviewsTable.grantReadData(getAllReviewsFn)
 
   }
