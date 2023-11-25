@@ -13,14 +13,6 @@ export class RestAPIStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // Tables 
-    const moviesTable = new dynamodb.Table(this, "MoviesTable", {
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
-      removalPolicy: cdk.RemovalPolicy.DESTROY,
-      tableName: "Movies",
-    });
-
     const movieReviewsTable = new dynamodb.Table(this, "MovieReviewsTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
@@ -31,7 +23,7 @@ export class RestAPIStack extends cdk.Stack {
     
     movieReviewsTable.addLocalSecondaryIndex({
       indexName: "reviewIx",
-      sortKey: { name: "reviewDate", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
     });
 
 
@@ -76,10 +68,10 @@ export class RestAPIStack extends cdk.Stack {
       },
     });
 
-    const getReviewByNameFn = new lambdanode.NodejsFunction(this, "GetReviewByNameFn", {
+    const getReviewsByNameAndIdFn = new lambdanode.NodejsFunction(this, "GetReviewsByNameAndIdFn", {
       architecture: lambda.Architecture.ARM_64,
       runtime: lambda.Runtime.NODEJS_16_X,
-      entry: `${__dirname}/../lambdas/getReviewByName.ts`,
+      entry: `${__dirname}/../lambdas/getReviewsByNameAndId.ts`,
       timeout: cdk.Duration.seconds(10),
       memorySize: 128,
       environment: {
@@ -94,14 +86,13 @@ export class RestAPIStack extends cdk.Stack {
         action: "batchWriteItem",
         parameters: {
           RequestItems: {
-            [moviesTable.tableName]: generateBatch(movies),
             [movieReviewsTable.tableName]: generateBatch(movieReviews),
           },
         },
         physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"), //.of(Date.now().toString()),
       },
       policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [moviesTable.tableArn, movieReviewsTable.tableArn],  // Includes movie reviews
+        resources: [movieReviewsTable.tableArn],  // Includes movie reviews
       }),
     });
 
@@ -165,14 +156,14 @@ export class RestAPIStack extends cdk.Stack {
           const reviewNameEndpoint = reviewsEndpoint.addResource("{reviewerName}");
           reviewNameEndpoint.addMethod(
             "GET",
-            new apig.LambdaIntegration(getReviewByNameFn, { proxy: true })
+            new apig.LambdaIntegration(getReviewsByNameAndIdFn, { proxy: true })
           );
 
 
     // Permissions 
     movieReviewsTable.grantReadWriteData(newReviewFn)
     movieReviewsTable.grantReadData(getReviewsByNameFn)
-    movieReviewsTable.grantReadData(getReviewByNameFn)
+    movieReviewsTable.grantReadData(getReviewsByNameAndIdFn)
     movieReviewsTable.grantReadData(getAllReviewsByRatingFn)
     movieReviewsTable.grantReadData(getAllReviewsFn)
 
