@@ -29,10 +29,10 @@ export class RestAPIStack extends cdk.Stack {
       tableName: "MovieReviews",
     });
     
-    // movieReviewsTable.addLocalSecondaryIndex({
-    //   indexName: "reviewIx",
-    //   sortKey: { name: "reviewDate", type: dynamodb.AttributeType.STRING },
-    // });
+    movieReviewsTable.addLocalSecondaryIndex({
+      indexName: "reviewIx",
+      sortKey: { name: "reviewDate", type: dynamodb.AttributeType.STRING },
+    });
 
 
     // Functions 
@@ -105,6 +105,18 @@ export class RestAPIStack extends cdk.Stack {
       }),
     });
 
+    const getAllReviewsByRatingFn = new lambdanode.NodejsFunction(this, "GetAllReviewsByRatingFn", {
+      architecture: lambda.Architecture.ARM_64,
+      runtime: lambda.Runtime.NODEJS_16_X,
+      entry: `${__dirname}/../lambdas/getAllReviewsByRating.ts`,
+      timeout: cdk.Duration.seconds(10),
+      memorySize: 128,
+      environment: {
+        TABLE_NAME: movieReviewsTable.tableName,
+        REGION: "eu-west-1",
+      },
+    });
+
 
     // REST API 
     const api = new apig.RestApi(this, "RestAPI", {
@@ -124,37 +136,44 @@ export class RestAPIStack extends cdk.Stack {
 
     const moviesEndpoint = api.root.addResource("movies");
 
-    const reviewEndpoint = moviesEndpoint.addResource("reviews");
-    reviewEndpoint.addMethod(
-      "POST",
-      new apig.LambdaIntegration(newReviewFn, { proxy: true })
-    );
+      const reviewEndpoint = moviesEndpoint.addResource("reviews");
+      reviewEndpoint.addMethod(
+        "POST",
+        new apig.LambdaIntegration(newReviewFn, { proxy: true })
+      );
 
-    const reviewerNameEndpoint = reviewEndpoint.addResource("{reviewerName}");
-    reviewerNameEndpoint.addMethod(
-      "GET",
-      new apig.LambdaIntegration(getReviewsByNameFn, { proxy: true })
-    );
+        // Get all the reviews written by a specific user
+        const reviewerNameEndpoint = reviewEndpoint.addResource("{reviewerName}");
+        reviewerNameEndpoint.addMethod(
+          "GET",
+          new apig.LambdaIntegration(getReviewsByNameFn, { proxy: true })
+        );
 
-    const movieEndpoint = moviesEndpoint.addResource("{movieId}");
+      const movieEndpoint = moviesEndpoint.addResource("{movieId}");
 
-    const reviewsEndpoint = movieEndpoint.addResource("reviews");
-    reviewsEndpoint.addMethod(
-      "GET",
-      new apig.LambdaIntegration(getAllReviewsFn, { proxy: true })
-    );
+        const reviewsEndpoint = movieEndpoint.addResource("reviews");
+        // reviewsEndpoint.addMethod(
+        //   "GET",
+        //   new apig.LambdaIntegration(getAllReviewsFn, { proxy: true })
+        // );
+        reviewsEndpoint.addMethod(
+          "GET",
+          new apig.LambdaIntegration(getAllReviewsByRatingFn, { proxy: true })
+        );
 
-    const reviewNameEndpoint = reviewEndpoint.addResource("{reviewerName}");
-    reviewNameEndpoint.addMethod(
-      "GET",
-      new apig.LambdaIntegration(getReviewByNameFn, { proxy: true })
-    );
+          // Get the review for the movie with the specified movie ID and written by the named reviewer.
+          const reviewNameEndpoint = reviewsEndpoint.addResource("{reviewerName}");
+          reviewNameEndpoint.addMethod(
+            "GET",
+            new apig.LambdaIntegration(getReviewByNameFn, { proxy: true })
+          );
 
 
     // Permissions 
     movieReviewsTable.grantReadWriteData(newReviewFn)
     movieReviewsTable.grantReadData(getReviewsByNameFn)
     movieReviewsTable.grantReadData(getReviewByNameFn)
+    movieReviewsTable.grantReadData(getAllReviewsByRatingFn)
     movieReviewsTable.grantReadData(getAllReviewsFn)
 
   }
