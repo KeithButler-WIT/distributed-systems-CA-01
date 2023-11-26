@@ -29,10 +29,10 @@ export class AppApi extends Construct {
       tableName: "MovieReviews",
     });
     
-    movieReviewsTable.addLocalSecondaryIndex({
-      indexName: "reviewIx",
-      sortKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
-    });
+    // movieReviewsTable.addLocalSecondaryIndex({
+    //   indexName: "reviewIx",
+    //   sortKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
+    // });
 
     // REST API 
     const AppApi = new apig.RestApi(this, "AppApi", {
@@ -54,6 +54,7 @@ export class AppApi extends Construct {
         USER_POOL_ID: props.userPoolId,
         CLIENT_ID: props.userPoolClientId,
         REGION: cdk.Aws.REGION,
+        TABLE_NAME: movieReviewsTable.tableName,
       },
     };
 
@@ -110,7 +111,7 @@ export class AppApi extends Construct {
         physicalResourceId: custom.PhysicalResourceId.of("moviesddbInitData"), //.of(Date.now().toString()),
       },
       policy: custom.AwsCustomResourcePolicy.fromSdkCalls({
-        resources: [movieReviewsTable.tableArn],  // Includes movie reviews
+        resources: [movieReviewsTable.tableArn],
       }),
     });
 
@@ -132,8 +133,9 @@ export class AppApi extends Construct {
 
         const reviewsEndpoint = movieEndpoint.addResource("reviews");
         // reviewsEndpoint.addMethod(
-        //   "GET",
-        //   new apig.LambdaIntegration(getAllReviewsFn, { proxy: true })
+          // "GET",
+          // new apig.LambdaIntegration(getAllReviewsFn)
+          // new apig.LambdaIntegration(getAllReviewsByRatingFn)
         // );
         reviewsEndpoint.addMethod(
           "GET",
