@@ -55,7 +55,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
       const rating = queryParams.minRating ? parseInt(queryParams.minRating) : undefined;
       commandInput = {
         ...commandInput,
-        // IndexName: "reviewIx",
+        IndexName: "reviewIx",
         KeyConditionExpression: "movieId = :m and rating > :r",
         ExpressionAttributeValues: {
           ":m": movieId,

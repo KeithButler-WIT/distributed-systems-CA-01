@@ -24,15 +24,15 @@ export class AppApi extends Construct {
     const movieReviewsTable = new dynamodb.Table(this, "MovieReviewsTable", {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       partitionKey: { name: "movieId", type: dynamodb.AttributeType.NUMBER },
-      sortKey: { name: "reviewDate", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       tableName: "MovieReviews",
     });
     
-    // movieReviewsTable.addLocalSecondaryIndex({
-    //   indexName: "reviewIx",
-    //   sortKey: { name: "reviewerName", type: dynamodb.AttributeType.STRING },
-    // });
+    movieReviewsTable.addLocalSecondaryIndex({
+      indexName: "reviewIx",
+      sortKey: { name: "reviewDate", type: dynamodb.AttributeType.STRING },
+    });
 
     // REST API 
     const AppApi = new apig.RestApi(this, "AppApi", {

@@ -23,6 +23,15 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
         body: JSON.stringify({ Message: "Missing reviewer name" }),
       };
     }
+    if (!movieId) {
+      return {
+        statusCode: 404,
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ Message: "Missing movie id" }),
+      };
+    }
 
     let commandInput: QueryCommandInput = {
         TableName: process.env.TABLE_NAME,
@@ -30,7 +39,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     if (reviewerName) {
         commandInput = {
             ...commandInput,
-            IndexName: "reviewIx",
+            // IndexName: "reviewIx",
             KeyConditionExpression: "movieId = :m and begins_with(reviewerName, :n)",
             ExpressionAttributeValues: {
                 ":m": movieId,
@@ -38,16 +47,6 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
             },
         };
     }
-  
-    // commandInput = {
-        // ...commandInput,
-        // IndexName: "reviewerIx",
-        // KeyConditionExpression: "movieId = :m and begins_with(reviewerName, :n)",
-        // ExpressionAttributeValues: {
-        //   ":m": movieId,
-        //   ":n": reviewerName,
-        // },
-    // };
 
     const commandOutput = await ddbDocClient.send(
       new QueryCommand(commandInput)
