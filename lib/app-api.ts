@@ -31,7 +31,7 @@ export class AppApi extends Construct {
     
     movieReviewsTable.addLocalSecondaryIndex({
       indexName: "reviewIx",
-      sortKey: { name: "rating", type: dynamodb.AttributeType.STRING },
+      sortKey: { name: "rating", type: dynamodb.AttributeType.NUMBER },
     });
 
     // REST API 
