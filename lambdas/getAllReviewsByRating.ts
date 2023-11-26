@@ -52,14 +52,14 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     let commandInput: QueryCommandInput = {
       TableName: process.env.TABLE_NAME,
     };
-    if ("minRating" in queryParams) {
+    if ("rating" in queryParams) {
       commandInput = {
         ...commandInput,
         IndexName: "reviewIx",
-        KeyConditionExpression: "movieId = movieId and rating = rating",
+        KeyConditionExpression: "movieId = :m and rating > :r",
         ExpressionAttributeValues: {
-          movieId: movieId,
-          rating: rating,
+          ":m": movieId,
+          ":r": rating,
         },
       };
     } else {
