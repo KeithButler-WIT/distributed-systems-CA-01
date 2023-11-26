@@ -1,6 +1,22 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "definitions": {
+        "ConfirmSignUpBody": {
+            "additionalProperties": false,
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "code",
+                "username"
+            ],
+            "type": "object"
+        },
         "Movie": {
             "additionalProperties": false,
             "properties": {
@@ -61,6 +77,9 @@
                 "movieId": {
                     "type": "number"
                 },
+                "rating": {
+                    "type": "number"
+                },
                 "reviewDate": {
                     "type": "string"
                 },
@@ -71,6 +90,7 @@
             "required": [
                 "content",
                 "movieId",
+                "rating",
                 "reviewDate",
                 "reviewerName"
             ],
@@ -82,6 +102,9 @@
                 "movieId": {
                     "type": "string"
                 },
+                "rating": {
+                    "type": "number"
+                },
                 "reviewDate": {
                     "type": "string"
                 },
@@ -89,8 +112,41 @@
                     "type": "string"
                 }
             },
+            "type": "object"
+        },
+        "SignInBody": {
+            "additionalProperties": false,
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
             "required": [
-                "movieId"
+                "password",
+                "username"
+            ],
+            "type": "object"
+        },
+        "SignUpBody": {
+            "additionalProperties": false,
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "email",
+                "password",
+                "username"
             ],
             "type": "object"
         }

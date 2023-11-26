@@ -61,7 +61,8 @@ export const movies : Movie[] = [
       movieId: 1234,
       reviewerName: "Joe Blogs",
       reviewDate: "2023-10-20",
-      content: "Content of the review.",
+      content: "Content of the review.",      
+      rating: 5,
     },
     {
       // reviewId: 2,
@@ -69,5 +70,6 @@ export const movies : Movie[] = [
       reviewerName: "Harry Human",
       reviewDate: "2022-08-12",
       content: "Content of the review.",
+      rating: 2,
     },
 ];

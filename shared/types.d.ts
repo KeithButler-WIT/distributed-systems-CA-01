@@ -17,11 +17,29 @@ export type Movie = {
     reviewerName: string;
     reviewDate: string;
     content: string
+    rating: number
   }
 
   // Used to validate the query string og HTTP Get requests
   export type MovieReviewQueryParams = {
-    movieId: string;
+    movieId?: string;
     reviewerName?: string;
-    reviewDate?: string
+    reviewDate?: string;
+    rating?: number
+  }
+
+  export type SignUpBody = {
+    username: string;
+    password: string;
+    email: string
+  }
+
+  export type ConfirmSignUpBody = {
+    username: string;
+    code: string;
+  }
+
+  export type SignInBody = {
+    username: string;
+    password: string;
   }
