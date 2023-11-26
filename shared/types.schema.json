@@ -103,7 +103,7 @@
                     "type": "string"
                 },
                 "rating": {
-                    "type": "number"
+                    "type": "string"
                 },
                 "reviewDate": {
                     "type": "string"

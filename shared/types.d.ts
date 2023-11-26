@@ -25,7 +25,7 @@ export type Movie = {
     movieId?: string;
     reviewerName?: string;
     reviewDate?: string;
-    rating?: number
+    rating?: string
   }
 
   export type SignUpBody = {
