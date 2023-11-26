@@ -50,7 +50,7 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     let commandInput: QueryCommandInput = {
       TableName: process.env.TABLE_NAME,
     };
-    if (queryParams && "rating" in queryParams ) {
+    if (queryParams && "minRating" in queryParams ) {
           // const parameters = event.queryStringParameters;
       const rating = queryParams.minRating ? parseInt(queryParams.minRating) : undefined;
       commandInput = {
