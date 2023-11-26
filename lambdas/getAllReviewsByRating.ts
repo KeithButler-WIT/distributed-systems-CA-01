@@ -25,37 +25,37 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
 
     const queryParams = event.queryStringParameters;
     console.log("queryParams: ", queryParams);
-    if (!queryParams) {
-      return {
-        statusCode: 500,
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({ message: "Missing query parameters" }),
-      };
-    }
-    if (!isValidQueryParams(queryParams)) {
-      return {
-        statusCode: 500,
-        headers: {
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          message: `Incorrect type. Must match Query parameters schema`,
-          schema: schema.definitions["MovieReviewQueryParams"],
-        }),
-      };
-    }
+    // if (!queryParams && !movieId) {
+    //   return {
+    //     statusCode: 500,
+    //     headers: {
+    //       "content-type": "application/json",
+    //     },
+    //     body: JSON.stringify({ message: "Missing query parameters" }),
+    //   };
+    // }
+    // if (!isValidQueryParams(queryParams)) {
+    //   return {
+    //     statusCode: 500,
+    //     headers: {
+    //       "content-type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    //       message: `Incorrect type. Must match Query parameters schema`,
+    //       schema: schema.definitions["MovieReviewQueryParams"],
+    //     }),
+    //   };
+    // }
     
-    // const parameters = event.queryStringParameters;
-    const rating = queryParams.rating ? parseInt(queryParams.rating) : undefined;
     let commandInput: QueryCommandInput = {
       TableName: process.env.TABLE_NAME,
     };
-    if ("rating" in queryParams) {
+    if (queryParams && "rating" in queryParams ) {
+          // const parameters = event.queryStringParameters;
+      const rating = queryParams.minRating ? parseInt(queryParams.minRating) : undefined;
       commandInput = {
         ...commandInput,
-        IndexName: "reviewIx",
+        // IndexName: "reviewIx",
         KeyConditionExpression: "movieId = :m and rating > :r",
         ExpressionAttributeValues: {
           ":m": movieId,
@@ -65,9 +65,9 @@ export const handler: APIGatewayProxyHandlerV2 = async (event, context) => {
     } else {
         commandInput = {
           ...commandInput,
-          KeyConditionExpression: "movieId = movieId",
+          KeyConditionExpression: "movieId = :m",
           ExpressionAttributeValues: {
-            movieId: movieId,
+            ":m": movieId,
           },
         };
       }
