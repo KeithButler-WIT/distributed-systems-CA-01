@@ -7,4 +7,3 @@ import { AuthAppStack } from '../lib/auth-app-stack';
 
 const app = new cdk.App();
 new AuthAppStack(app, "AwsServerlessAuthStack", { env: { region: "eu-west-1" } });
-new RestAPIStack(app, "RestAPIStack", { env: { region: "eu-west-1" } });
